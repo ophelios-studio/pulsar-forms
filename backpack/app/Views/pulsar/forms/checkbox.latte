@@ -1,0 +1,73 @@
+{*
+    ATTRIBUTES:
+    . id
+    . label
+    . help
+    . value
+    . switch
+    . checked
+    . required
+*}
+{define "zf-input-checkbox", string $name, array $attributes = []}
+    {var string $identifier = $attributes['id'] ?? uniqid("checkbox-")}
+    {var ?string $label = $attributes['label'] ?? null}
+    {var ?string $description = $attributes['help'] ?? null}
+    {var string $value = $attributes['value'] ?? '1'}
+    {var bool $switch = $attributes['switch'] ?? false}
+    {var bool $checked = $attributes['checked'] ?? false}
+    {var bool $required = $attributes['required'] ?? false}
+
+    {* Checked state *}
+    {var string $sessionValue = !is_blank($name) ? val(rtrim($name, "[]"), $checked)}
+    {if is_array($sessionValue)}
+        {do $checked = in_array($value, $sessionValue)}
+    {else}
+        {do $checked = $sessionValue == $value}
+    {/if}
+
+    {* Class *}
+    {var string $labelClass = "form-check"}
+    {if $switch}
+        {do $labelClass .= " form-switch form-switch-3"}
+    {/if}
+
+    {* Tag attributes *}
+    {var array $supportedAttributes = ['id', 'name', 'value', 'checked', 'label', 'description', 'switch', 'required']}
+    {var array $tagsAttributes = []}
+    {do $tagsAttributes['name'] = $name}
+    {do $tagsAttributes['value'] = $value}
+    {if $checked}
+        {do $tagsAttributes['checked'] = true}
+    {/if}
+    {if $required}
+        {do $tagsAttributes['required'] = true}
+    {/if}
+
+    {* Any custom attributes *}
+    {var array $customAttributes = []}
+    {foreach $attributes as $attributeName => $attributeValue}
+        {if !in_array($attributeName, $supportedAttributes)}
+            {do $customAttributes[$attributeName] = $attributeValue}
+        {/if}
+    {/foreach}
+
+    <label class="{$labelClass}">
+        <input type="checkbox" class="form-check-input" id="{$identifier}" n:attr="$tagsAttributes + $customAttributes">
+        <span n:if="$label" class="form-check-label">
+            {$label|noescape}
+            {if $required}
+                {localize("labels.required")|noescape}
+            {/if}
+        </span>
+        <span n:if="$description" class="form-check-description">{$description|noescape}</span>
+    </label>
+{/define}
+
+{define "zf-field-checkbox", string $label, string $name, array $attributes = []}
+    {var string $identifier = $attributes['id'] ?? uniqid("checkbox-")}
+    {do $attributes['id'] = $identifier}
+    {do $attributes['label'] = $label}
+    <div class="mb-3">
+        {include "zf-input-checkbox", $name, $attributes}
+    </div>
+{/define}
