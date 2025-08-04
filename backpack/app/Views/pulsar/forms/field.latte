@@ -1,0 +1,12 @@
+{define "zf-field", string $label, string $inputIdentifier, array $attributes = []}
+    {var bool $required = $attributes['required'] ?? false}
+    {var ?string $layout = $attributes['layout'] ?? null}
+    <div class="mb-3">
+        <label for="{$inputIdentifier}" class="form-label">{$label . ($required ? "<sup class='text-danger'>*</sup>")|noescape}</label>
+        {if $layout}
+            {$layout}
+        {else}
+            {block content}{/block}
+        {/if}
+    </div>
+{/define}
