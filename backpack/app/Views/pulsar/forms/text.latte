@@ -120,19 +120,19 @@
 
 {define "zf-field-email", string $label, string $name, array $attributes = []}
     {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='bi bi-envelope-at text-primary'></i>"}
-    {do $attributes['placeholder'] = $attributes['placeholder'] ?? "Ex. example@mailer.com"}
+    {do $attributes['placeholder'] = $attributes['placeholder'] ?? localize("forms.placeholders.email")}
     {include "zf-field-text", $label, $name, $attributes}
 {/define}
 
 {define "zf-field-website", string $label, string $name, array $attributes = []}
     {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='bi bi-globe-americas text-primary'></i>"}
-    {do $attributes['placeholder'] = $attributes['placeholder'] ?? "Ex. https://exemple.com"}
+    {do $attributes['placeholder'] = $attributes['placeholder'] ?? localize("forms.placeholders.website")}
     {include "zf-field-text", $label, $name, $attributes}
 {/define}
 
 {define "zf-field-phone", string $label, string $name, array $attributes = []}
     {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='bi bi-telephone text-primary'></i>"}
-    {do $attributes['placeholder'] = $attributes['placeholder'] ?? "Ex. 1-555-123-4567"}
+    {do $attributes['placeholder'] = $attributes['placeholder'] ?? localize("forms.placeholders.phone")}
     {do $attributes['mask'] = "phone"}
     {include "zf-field-text", $label, $name, $attributes}
 {/define}
@@ -144,7 +144,7 @@
 
 {define "zf-field-money", string $label, string $name, array $attributes = []}
     {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='bi bi-currency-dollar text-primary'></i>"}
-    {do $attributes['placeholder'] = $attributes['placeholder'] ?? "Ex. 123,56"}
+    {do $attributes['placeholder'] = $attributes['placeholder'] ?? localize("forms.placeholders.money")}
     {do $attributes['mask'] = "money"}
     {include "zf-field-text", $label, $name, $attributes}
 {/define}

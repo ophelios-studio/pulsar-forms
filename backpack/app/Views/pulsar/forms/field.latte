@@ -2,7 +2,7 @@
     {var bool $required = $attributes['required'] ?? false}
     {var ?string $layout = $attributes['layout'] ?? null}
     <div class="mb-3">
-        <label for="{$inputIdentifier}" class="form-label">{$label . ($required ? "<sup class='text-danger'>*</sup>")|noescape}</label>
+        <label for="{$inputIdentifier}" class="form-label">{$label . ($required ? localize("forms.labels.required"))|noescape}</label>
         {if $layout}
             {$layout}
         {else}

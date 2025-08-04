@@ -1,0 +1,14 @@
+{
+  "forms": {
+    "labels": {
+      "required": "<sup class='text-danger'>*</sup>"
+    },
+
+    "placeholders": {
+      "email": "Ex. example@mailer.com",
+      "website": "Ex. https://exemple.com",
+      "phone": "Ex. 1-555-123-4567",
+      "money": "Ex. 123,56"
+    }
+  }
+}
