@@ -1,0 +1,150 @@
+/*
+    ATTRIBUTES:
+    . default="" (default value for the field)
+    . addon-start="" (add a text or any content as a left addon for a group input)
+    . addon-end="" (add a text or any content as a right addon for a group input)
+    . addon-flat=false
+    . placeholder="" (first option of the select element)
+    . disabled=false (renders the input unusable, value is not sent when form is submitted)
+    . required=false (prevent submission if value is not set)
+    . minlength="" (minimum characters allowed for the input)
+    . readonly=false (cannot be modified, value is sent when form is submitted, display as label)
+    . mask="" (phone|money|decimal|integer, ...)
+    . mask-scale="" (optional number of digit after the decimal separator)
+    . autocomplete=false (disable autocomplete for the input))
+*/
+{define "zf-input-text", string $name, array $attributes = []}
+    {var bool $readOnly = $attributes['readonly'] ?? false}
+    {var bool $addonFlat = $attributes['addon-flat'] ?? false}
+    {var ?string $addonStart = $attributes['addon-start'] ?? null}
+    {var ?string $addonEnd = $attributes['addon-end'] ?? null}
+    {var ?string $mask = $attributes['mask'] ?? null}
+    {var ?string $maskScale = $attributes['mask-scale'] ?? null}
+    {var ?string $maskMin = $attributes['mask-min'] ?? null}
+    {var ?string $maskMax = $attributes['mask-max'] ?? null}
+    {var bool $autocomplete = $attributes['autocomplete'] ?? false}
+    {var array $tagsAttributes = []}
+
+    {* Manage mask *}
+    {if $mask}
+        {do $tagsAttributes['data-zf-mask'] = $mask}
+        {if $mask == 'decimal' || $mask == 'money'}
+            {ifset $attributes['default']}
+                {* the str_replace is a fix because somehow the mask do not apply properly if the default value has a "." instead of "," *}
+                {do $attributes['default'] = str_replace('.', ',', $attributes['default'])}
+            {/ifset}
+        {/if}
+    {/if}
+    {var string $defaultValue = $attributes['default'] ?? ""}
+    {var string $sessionValue = strval(val($name, $defaultValue))}
+
+    {* Generate classes *}
+    {var string $class = !$readOnly ? 'form-control' : 'form-control-plaintext'}
+
+    {* Tag attributes *}
+    {var array $supportedAttributes = ['name', 'no-feedback', 'addon-start', 'addon-end', 'counter', 'mask', 'mask-scale', 'mask-min', 'mask-max', 'default', 'required', 'autocomplete']}
+
+    {do $tagsAttributes['name'] = $name}
+    {if $maskScale}
+        {do $tagsAttributes['data-zf-mask-scale'] = $maskScale}
+    {/if}
+    {if $maskMin}
+        {do $tagsAttributes['data-zf-mask-min'] = $maskMin}
+    {/if}
+    {if $maskMax}
+        {do $tagsAttributes['data-zf-mask-max'] = $maskMax}
+    {/if}
+    {if !is_blank($sessionValue)}
+        {do $tagsAttributes['value'] = $sessionValue}
+    {/if}
+    {if !$autocomplete}
+        {do $tagsAttributes['autocomplete'] = "off"}
+        {* Hack for Chrome browsers to understand autocomplete=off (@see https://gist.github.com/niksumeiko/360164708c3b326bd1c8?permalink_comment_id=3793032#) *}
+        {do $tagsAttributes['role'] = "presentation"}
+    {/if}
+
+    {* Any custom attributes *}
+    {var array $customAttributes = []}
+    {foreach $attributes as $attributeName => $attributeValue}
+        {if !in_array($attributeName, $supportedAttributes)}
+            {do $customAttributes[$attributeName] = $attributeValue}
+        {/if}
+    {/foreach}
+
+    {if $addonStart || $addonEnd}
+        {var string $inputGroupClass = "input-group"}
+        {if $addonFlat}
+            {do $inputGroupClass .= " input-group-flat"}
+        {/if}
+        <div class="{$inputGroupClass}">
+            <span n:if="$addonStart" class="input-group-text">{$addonStart|noescape}</span>
+            <input type="text" class="{$class}" n:attr="$tagsAttributes + $customAttributes" />
+            <span n:if="$addonEnd" class="input-group-text">{$addonEnd|noescape}</span>
+        </div>
+    {else}
+        <input type="text" class="{$class}" n:attr="$tagsAttributes + $customAttributes" />
+    {/if}
+{/define}
+
+/*
+    ATTRIBUTES:
+    . help="" (add an indicator text underneath the field)
+    . required=false (prevent submission if value is not set and display a red * indicator on label)
+
+    INHERITED ATTRIBUTES:
+    . default="" (default value for the field)
+    . addon-start="" (add a text or any content as a left addon for a group input)
+    . addon-end="" (add a text or any content as a right addon for a group input)
+    . placeholder="" (first option of the select element)
+    . disabled=false (renders the input unusable, value is not sent when form is submitted)
+    . required=false (prevent submission if value is not set)
+    . maxlength="" (maximum characters allowed for the input)
+    . minlength="" (minimum characters allowed for the input)
+    . readonly=false (cannot be modified, value is sent when form is submitted, display as label)
+    . counter=true (displays character count indicator in relation to the maxlength, defaults to true)
+    . no-feedback=false (enable or disable feedback display)
+    . mask="" (phone|money|decimal|integer, ...)
+
+*/
+{define "zf-field-text", string $label, string $name, array $attributes = []}
+    {var string $identifier = $attributes['id'] ?? uniqid("input-text-")}
+    {var bool $required = $attributes['required'] ?? false}
+    {var ?string $help = $attributes['help'] ?? null}
+    {capture $layout}
+        {do $attributes['id'] = $identifier}
+        {include "zf-input-text", $name, $attributes}
+        <div n:ifcontent class="form-text">{$help|noescape}</div>
+    {/capture}
+    {include "zf-field", $label, $identifier, [required: $required, layout: $layout]}
+{/define}
+
+{define "zf-field-email", string $label, string $name, array $attributes = []}
+    {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='bi bi-envelope-at text-primary'></i>"}
+    {do $attributes['placeholder'] = $attributes['placeholder'] ?? "Ex. example@mailer.com"}
+    {include "zf-field-text", $label, $name, $attributes}
+{/define}
+
+{define "zf-field-website", string $label, string $name, array $attributes = []}
+    {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='bi bi-globe-americas text-primary'></i>"}
+    {do $attributes['placeholder'] = $attributes['placeholder'] ?? "Ex. https://exemple.com"}
+    {include "zf-field-text", $label, $name, $attributes}
+{/define}
+
+{define "zf-field-phone", string $label, string $name, array $attributes = []}
+    {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='bi bi-telephone text-primary'></i>"}
+    {do $attributes['placeholder'] = $attributes['placeholder'] ?? "Ex. 1-555-123-4567"}
+    {do $attributes['mask'] = "phone"}
+    {include "zf-field-text", $label, $name, $attributes}
+{/define}
+
+{define "zf-field-decimal", string $label, string $name, array $attributes = []}
+    {do $attributes['mask'] = "decimal"}
+    {include "zf-field-text", $label, $name, $attributes}
+{/define}
+
+{define "zf-field-money", string $label, string $name, array $attributes = []}
+    {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='bi bi-currency-dollar text-primary'></i>"}
+    {do $attributes['placeholder'] = $attributes['placeholder'] ?? "Ex. 123,56"}
+    {do $attributes['mask'] = "money"}
+    {include "zf-field-text", $label, $name, $attributes}
+{/define}
