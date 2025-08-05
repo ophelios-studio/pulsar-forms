@@ -1,7 +1,7 @@
 export default class Form {
 
     #formElements;
-    #loadingInnerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    #loadingInnerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>';
 
     static reset(formElement) {
         formElement.removeAttribute("data-zf-submitting");
