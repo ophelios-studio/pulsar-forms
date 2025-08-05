@@ -3,7 +3,7 @@
     . default="" (default value for the field)
     . addon-start="" (add a text or any content as a left addon for a group input)
     . addon-end="" (add a text or any content as a right addon for a group input)
-    . addon-flat=false
+    . addon-flat=true
     . placeholder="" (first option of the select element)
     . disabled=false (renders the input unusable, value is not sent when form is submitted)
     . required=false (prevent submission if value is not set)
@@ -15,7 +15,7 @@
 */
 {define "zf-input-text", string $name, array $attributes = []}
     {var bool $readOnly = $attributes['readonly'] ?? false}
-    {var bool $addonFlat = $attributes['addon-flat'] ?? false}
+    {var bool $addonFlat = $attributes['addon-flat'] ?? true}
     {var ?string $addonStart = $attributes['addon-start'] ?? null}
     {var ?string $addonEnd = $attributes['addon-end'] ?? null}
     {var ?string $mask = $attributes['mask'] ?? null}
