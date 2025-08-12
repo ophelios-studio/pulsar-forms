@@ -4,6 +4,7 @@
     . addon-start="" (add a text or any content as a left addon for a group input)
     . addon-end="" (add a text or any content as a right addon for a group input)
     . addon-flat=true
+    . addon-text=false (remove paddings with ps-0 and pe-0 for the addon)
     . placeholder="" (first option of the select element)
     . disabled=false (renders the input unusable, value is not sent when form is submitted)
     . required=false (prevent submission if value is not set)
@@ -16,6 +17,7 @@
 {define "zf-input-text", string $name, array $attributes = []}
     {var bool $readOnly = $attributes['readonly'] ?? false}
     {var bool $addonFlat = $attributes['addon-flat'] ?? true}
+    {var bool $addonText = $attributes['addon-text'] ?? true}
     {var ?string $addonStart = $attributes['addon-start'] ?? null}
     {var ?string $addonEnd = $attributes['addon-end'] ?? null}
     {var ?string $mask = $attributes['mask'] ?? null}
@@ -40,6 +42,12 @@
 
     {* Generate classes *}
     {var string $class = !$readOnly ? 'form-control' : 'form-control-plaintext'}
+    {if $addonText && $addonStart}
+        {do $class .= " ps-0"}
+    {/if}
+    {if $addonText && $addonEnd}
+        {do $class .= " pe-0"}
+    {/if}
 
     {* Tag attributes *}
     {var array $supportedAttributes = ['name', 'no-feedback', 'addon-start', 'addon-end', 'counter', 'mask', 'mask-scale', 'mask-min', 'mask-max', 'default', 'required', 'autocomplete']}
