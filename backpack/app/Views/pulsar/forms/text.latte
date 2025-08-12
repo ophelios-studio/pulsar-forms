@@ -17,7 +17,7 @@
 {define "zf-input-text", string $name, array $attributes = []}
     {var bool $readOnly = $attributes['readonly'] ?? false}
     {var bool $addonFlat = $attributes['addon-flat'] ?? true}
-    {var bool $addonText = $attributes['addon-text'] ?? true}
+    {var bool $addonText = $attributes['addon-text'] ?? false}
     {var ?string $addonStart = $attributes['addon-start'] ?? null}
     {var ?string $addonEnd = $attributes['addon-end'] ?? null}
     {var ?string $mask = $attributes['mask'] ?? null}
@@ -116,12 +116,12 @@
 */
 {define "zf-field-text", string $label, string $name, array $attributes = []}
     {var string $identifier = $attributes['id'] ?? uniqid("input-text-")}
-    {var bool $required = $attributes['required'] ?? false}
     {capture $layout}
         {do $attributes['id'] = $identifier}
         {include "zf-input-text", $name, $attributes}
     {/capture}
-    {include "zf-field", $label, $identifier, [required: $required, layout: $layout]}
+    {do $attributes['layout'] = $layout}
+    {include "zf-field", $label, $identifier, $attributes}
 {/define}
 
 {define "zf-field-email", string $label, string $name, array $attributes = []}
