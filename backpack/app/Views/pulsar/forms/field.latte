@@ -2,6 +2,7 @@
     {var bool $required = $attributes['required'] ?? false}
     {var ?string $layout = $attributes['layout'] ?? null}
     {var ?string $help = $attributes['help'] ?? null}
+    {var ?string $hint = $attributes['hint'] ?? null}
     <div class="mb-3">
         <label for="{$inputIdentifier}" class="form-label">
             {$label . ($required ? localize("forms.labels.required"))|noescape}
@@ -17,5 +18,6 @@
         {else}
             {block content}{/block}
         {/if}
+        <div n:ifcontent class="form-hint">{$hint|noescape}</div>
     </div>
 {/define}
