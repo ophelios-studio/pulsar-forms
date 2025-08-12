@@ -2,10 +2,12 @@
     {var bool $required = $attributes['required'] ?? false}
     {var ?string $layout = $attributes['layout'] ?? null}
     {var ?string $help = $attributes['help'] ?? null}
+    {var ?string $description = $attributes['description'] ?? null}
     {var ?string $hint = $attributes['hint'] ?? null}
     <div class="mb-3">
         <label for="{$inputIdentifier}" class="form-label">
             {$label . ($required ? localize("forms.labels.required"))|noescape}
+            <span n:if="$description" class="form-label-description">{$description|noescape}</span>
             <span n:if="$help"
                   class="form-help"
                   data-bs-toggle="popover"
