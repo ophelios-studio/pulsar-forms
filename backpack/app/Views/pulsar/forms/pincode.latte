@@ -1,0 +1,30 @@
+{*
+    ATTRIBUTES:
+    . size=6 (number of inputs)
+*}
+{define "zf-input-pincode", string $name, array $attributes = []}
+    {var int $size = $attributes['size'] ?? 6}
+    {var int $i = 0}
+    <div class="my-5" data-pin-count="{$size}">
+        <div class="row g-2">
+            {while $i < $size}
+                <div class="col">
+                    <input
+                        type="tel"
+                        class="form-control form-control-lg text-center px-3 py-3"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        name="{$name}"
+                        maxlength="1" />
+                </div>
+                {do ++$i}
+            {/while}
+        </div>
+    </div>
+    <script nonce="{nonce()}" type="module">
+        import PinCode from '/javascripts/pulsar/modules/pincode.js';
+        (new PinCode({$name})).initialize();
+    </script>
+{/define}
+
+
