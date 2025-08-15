@@ -1,0 +1,84 @@
+{*
+    ATTRIBUTES:
+    . default="" (default value for the field)
+    . addon-start="" (add a text or any content as a left addon for a group input)
+    . addon-end="" (add a text or any content as a right addon for a group input)
+    . addon-flat=true
+    . addon-text=false (remove paddings with ps-0 and pe-0 for the addon)
+    . placeholder="" (first option of the select element)
+    . disabled=false (renders the input unusable, value is not sent when form is submitted)
+    . required=false (prevent submission if value is not set)
+    . minlength="" (minimum characters allowed for the input)
+    . readonly=false (cannot be modified, value is sent when form is submitted, display as label)
+    . autocomplete=false (disable autocomplete for the input))
+    . auto-resize=false (if true, the textarea will automatically resize to fit the content)
+    . rows=5 (number of initial rows to display)
+*}
+{define "zf-input-textarea", string $name, array $attributes = []}
+    {var bool $readOnly = $attributes['readonly'] ?? false}
+    {var bool $addonFlat = $attributes['addon-flat'] ?? true}
+    {var bool $addonText = $attributes['addon-text'] ?? false}
+    {var ?string $addonStart = $attributes['addon-start'] ?? null}
+    {var ?string $addonEnd = $attributes['addon-end'] ?? null}
+    {var bool $autocomplete = $attributes['autocomplete'] ?? false}
+    {var string $rows = $attributes['rows'] ?? "5"}
+    {var bool $autoResize = $attributes['auto-resize'] ?? false}
+    {var array $tagsAttributes = []}
+
+    {var string $defaultValue = $attributes['default'] ?? ""}
+    {var string $sessionValue = strval(val($name, $defaultValue))}
+
+    {* Generate classes *}
+    {var string $class = !$readOnly ? 'form-control' : 'form-control-plaintext'}
+    {if $autoResize}
+        {do $class .= " zf-auto-resize"}
+    {/if}
+    {if $addonText && $addonStart}
+        {do $class .= " ps-0"}
+    {/if}
+    {if $addonText && $addonEnd}
+        {do $class .= " pe-0"}
+    {/if}
+
+    {* Tag attributes *}
+    {var array $supportedAttributes = ['name', 'no-feedback', 'addon-start', 'addon-end', 'default', 'required', 'autocomplete', 'auto-resize']}
+
+    {do $tagsAttributes['name'] = $name}
+    {if !$autocomplete}
+        {do $tagsAttributes['autocomplete'] = "off"}
+        {* Hack for Chrome browsers to understand autocomplete=off (@see https://gist.github.com/niksumeiko/360164708c3b326bd1c8?permalink_comment_id=3793032#) *}
+        {do $tagsAttributes['role'] = "presentation"}
+    {/if}
+
+    {* Any custom attributes *}
+    {var array $customAttributes = []}
+    {foreach $attributes as $attributeName => $attributeValue}
+        {if !in_array($attributeName, $supportedAttributes)}
+            {do $customAttributes[$attributeName] = $attributeValue}
+        {/if}
+    {/foreach}
+
+    {if $addonStart || $addonEnd}
+        {var string $inputGroupClass = "input-group"}
+        {if $addonFlat}
+            {do $inputGroupClass .= " input-group-flat"}
+        {/if}
+        <div class="{$inputGroupClass}">
+            <span n:if="$addonStart" class="input-group-text">{$addonStart|noescape}</span>
+            <textarea class="{$class}" n:attr="$tagsAttributes + $customAttributes">{$sessionValue|noescape}</textarea>
+            <span n:if="$addonEnd" class="input-group-text">{$addonEnd|noescape}</span>
+        </div>
+    {else}
+        <textarea class="{$class}" n:attr="$tagsAttributes + $customAttributes">{$sessionValue|noescape}</textarea>
+    {/if}
+{/define}
+
+{define "zf-field-textarea", string $label, string $name, array $attributes = []}
+    {var string $identifier = $attributes['id'] ?? uniqid("input-textarea-")}
+    {capture $layout}
+        {do $attributes['id'] = $identifier}
+        {include "zf-input-textarea", $name, $attributes}
+    {/capture}
+    {do $attributes['layout'] = $layout}
+    {include "zf-field", $label, $identifier, $attributes}
+{/define}
