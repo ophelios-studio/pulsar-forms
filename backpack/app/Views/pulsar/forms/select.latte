@@ -1,4 +1,4 @@
-/*
+{*
     ATTRIBUTES:
     . default=null (default value to select from within the given options)
     . placeholder=null (first option of the select element)
@@ -15,7 +15,7 @@
     . render-option="'<div>' + escape(data." . $labelProperty . ") + '</div>'" (design of the option compatible with TomSelect)
     . render-item="'<div>' + escape(item." . $labelProperty . ") + '</div>'"  (design of the selected item compatible with TomSelect)
     . var=null (if set, the TomSelect element will be defined into this variable name which can then be accessible)
-*/
+*}
 {define "zf-input-select", string $name, array $options = [], array $attributes = []}
     {var bool $native = $attributes['native'] ?? false}
     {var bool $multiple = $attributes['multiple'] ?? false}
