@@ -1,0 +1,110 @@
+{*
+    ATTRIBUTES:
+    . default-emoji="🔥"
+    . default-color="rgba(82, 170, 242, 0.7)"
+*}
+{define "zf-input-icon-picker", string $emojiName, string $colorName, array $attributes = []}
+    {var array $emojis = [
+        "👨‍🏫", "👨‍💻", "🎓", "🚀", "🔥", "👑", "❤️", "🎃", "🏈", "🎾", "🏐", "🏀", "⚽️", "🏒", "🥊", "🏓", "🏸", "⛳️",
+        "🏆", "🎭", "🎹", "🤡", "💩", "🦧", "🐉", "🌻", "⛄️", "🍎", "🍔", "🍩", "🍯", "🛝", "💡", "🎁", "💎", "📖",
+        "😊", "😁", "😂", "😍", "😭", "😡", "🤩", "😎"
+    ]}
+    {var array $colors = [
+        "rgba(253, 59, 49, 0.7)",
+        "rgba(255, 149, 2, 0.7)",
+        "rgba(255, 204, 1, 0.7)",
+        "rgba(25, 199, 88, 0.7)",
+        "rgba(82, 170, 242, 0.7)",
+        "rgba(0, 122, 255, 0.7)",
+        "rgba(89, 85, 215, 0.7)",
+        "rgba(235, 66, 107, 0.7)",
+        "rgba(191, 119, 218, 0.7)",
+        "rgba(157, 133, 99, 0.7)",
+        "rgba(91, 103, 112, 0.7)",
+        "rgba(216, 166, 159, 0.7)"
+    ]}
+    {var string $defaultEmojiValue = $attributes['default-emoji'] ?? "🔥"}
+    {var string $sessionEmojiValue = strval(val($emojiName, $defaultEmojiValue))}
+    {var string $defaultColorValue = $attributes['default-color'] ?? "rgba(82, 170, 242, 0.7)"}
+    {var string $sessionColorValue = strval(val($colorName, $defaultColorValue))}
+    {var string $selectedEmoji = $sessionEmojiValue}
+    {var string $selectedColor = $sessionColorValue}
+
+    {embed "zf-card"}
+        {block content}
+            <div class="zf-emoji-picker">
+                <ul>
+                    {foreach $emojis as $emoji}
+                        {if $emoji == $selectedEmoji}
+                            <li class="zf-emoji-picker-item selected" style="background-color: {$selectedColor|noescape};">{$emoji|noescape}</li>
+                        {else}
+                            <li class="zf-emoji-picker-item">{$emoji|noescape}</li>
+                        {/if}
+                    {/foreach}
+                </ul>
+            </div>
+            <input type="hidden" id="emoji-picker" name={$emojiName} value={$selectedEmoji|noescape} />
+        {/block}
+    {/embed}
+    {embed "zf-card"}
+        {block content}
+            <div class="zf-color-picker">
+                <ul>
+                    {foreach $colors as $color}
+                        {if $color == $selectedColor}
+                            <li class="zf-color-picker-item selected" style="background-color: {$color|noescape};"></li>
+                        {else}
+                            <li class="zf-color-picker-item" style="background-color: {$color|noescape};"></li>
+                        {/if}
+                    {/foreach}
+                </ul>
+            </div>
+            <input type="hidden" id="color-picker" name={$colorName} value={$selectedColor|noescape} />
+        {/block}
+    {/embed}
+    <script nonce={nonce()} n:syntax="off">
+        window.addEventListener("load", () => {
+            const colorItem = document.querySelectorAll(".zf-color-picker-item");
+            colorItem.forEach((baseItem) => {
+                baseItem.addEventListener("click", () => {
+                    colorItem.forEach((item) => {
+                        item.classList.remove("selected");
+                    });
+                    baseItem.classList.add("selected");
+                    let bgColor = window.getComputedStyle(baseItem).backgroundColor;
+                    document.getElementById("color-picker").value = bgColor;
+                    const emojiSelectedItem = document.querySelectorAll(".zf-emoji-picker-item.selected");
+                    emojiSelectedItem.forEach((item) => {
+                        item.style.backgroundColor = bgColor;
+                    });
+                });
+            });
+
+            const emojiItem = document.querySelectorAll(".zf-emoji-picker-item");
+            emojiItem.forEach((baseItem) => {
+                baseItem.addEventListener("click", () => {
+                    emojiItem.forEach((item) => {
+                        item.classList.remove("selected");
+                        item.style.backgroundColor = "";
+                    });
+                    baseItem.classList.add("selected");
+                    const colorSelectedItem = document.querySelectorAll(".zf-color-picker-item.selected");
+                    colorSelectedItem.forEach((item) => {
+                        baseItem.style.backgroundColor = window.getComputedStyle(item).backgroundColor;
+                    });
+                    document.getElementById("emoji-picker").value = baseItem.innerHTML;
+                });
+            });
+        });
+    </script>
+{/define}
+
+{define "zf-field-icon-picker", string $label, string $emojiName, string $colorName, array $attributes = []}
+    {var string $identifier = $attributes['id'] ?? uniqid("input-emoji-")}
+    {capture $layout}
+        {do $attributes['id'] = $identifier}
+        {include "zf-input-icon-picker", $emojiName, $colorName, $attributes}
+    {/capture}
+    {do $attributes['layout'] = $layout}
+    {include "zf-field", $label, $identifier, $attributes}
+{/define}
