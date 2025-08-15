@@ -1,0 +1,175 @@
+/*
+    ATTRIBUTES:
+    . default=null (default value to select from within the given options)
+    . placeholder=null (first option of the select element)
+    . disabled=false (renders the input unusable, value is not sent when form is submitted)
+    . required=false (prevent submission if value is not set)
+    . no-feedback=false (enable or disable feedback display)
+    . native=false (by default, renders as a TomSelect if true, will render as normal HTML select)
+    . multiple=false (enable pills selection)
+    . create=false (if true, enables to add a non-existing option, value will be the specified name)
+    . max-items=null (limit the amount of elements for multiple attribute)
+    . value-property="value" (value property to use to build the basic option for TomSelect from the given options)
+    . label-property="text" (label property to use to build the basic option for TomSelect from the given options)
+    . search-properties=["text"] (list of properties that can be searched)
+    . render-option="'<div>' + escape(data." . $labelProperty . ") + '</div>'" (design of the option compatible with TomSelect)
+    . render-item="'<div>' + escape(item." . $labelProperty . ") + '</div>'"  (design of the selected item compatible with TomSelect)
+    . var=null (if set, the TomSelect element will be defined into this variable name which can then be accessible)
+*/
+{define "zf-input-select", string $name, array $options = [], array $attributes = []}
+    {var bool $native = $attributes['native'] ?? false}
+    {var bool $multiple = $attributes['multiple'] ?? false}
+    {var bool $create = $attributes['create'] ?? false}
+    {var string $identifier = $attributes['id'] ?? uniqid("select-")}
+    {var string $valueProperty = $attributes['value-property'] ?? "value"}
+    {var string $labelProperty = $attributes['label-property'] ?? "text"}
+    {var string $searchProperties = $attributes['search-properties'] ?? [$labelProperty]}
+    {var string $renderOption = $attributes['render-option'] ?? "'<div>' + escape(data." . $labelProperty . ") + '</div>'"}
+    {var string $renderItem = $attributes['render-item'] ?? "'<div>' + escape(data." . $labelProperty . ") + '</div>'"}
+    {var ?string|array $defaultValue = $attributes['default'] ?? ($multiple ? [] : null)}
+    {var ?string $placeholder = $attributes['placeholder'] ?? null}
+    {var ?string $var = $attributes['var'] ?? null}
+    {var ?string $addonStart = $attributes['addon-start'] ?? null}
+    {var ?string $addonEnd = $attributes['addon-end'] ?? null}
+    {var bool $addonFlat = $attributes['addon-flat'] ?? true}
+    {var bool $addonText = $attributes['addon-text'] ?? false}
+    {var ?string|array $sessionValue = !is_blank($name) ? val(rtrim($name, "[]"), $defaultValue)}
+    {var bool $autocomplete = $attributes['autocomplete'] ?? false}
+
+    {* Generate classes *}
+    {var string $class = 'form-select'}
+    {if !$native}
+        {do $class .= " zf-tom-select"}
+    {/if}
+    {if $addonText && $addonStart}
+        {do $class .= " ps-0"}
+    {/if}
+    {if $addonText && $addonEnd}
+        {do $class .= " pe-0"}
+    {/if}
+
+    {* Tag attributes *}
+    {var array $supportedAttributes = ['name', 'addon-flat', 'addon-text', 'addon-start', 'addon-end', 'create', 'native', 'default', 'value-property', 'label-property', 'search-properties', 'render-item', 'render-option', 'required', 'autocomplete']}
+    {var array $tagsAttributes = []}
+    {do $tagsAttributes['name'] = $name}
+    {if !$autocomplete}
+        {do $tagsAttributes['autocomplete'] = "off"}
+        {* Hack for Chrome browsers to understand autocomplete=off (@see https://gist.github.com/niksumeiko/360164708c3b326bd1c8?permalink_comment_id=3793032#) *}
+        {do $tagsAttributes['role'] = "presentation"}
+    {/if}
+
+    {* Any custom attributes *}
+    {var array $customAttributes = []}
+    {foreach $attributes as $attributeName => $attributeValue}
+        {if !in_array($attributeName, $supportedAttributes)}
+            {do $customAttributes[$attributeName] = $attributeValue}
+        {/if}
+    {/foreach}
+
+    {if $addonStart || $addonEnd}
+        {var string $inputGroupClass = "input-group"}
+        {if $addonFlat}
+            {do $inputGroupClass .= " input-group-flat"}
+        {/if}
+        <div class="{$inputGroupClass}">
+            <span n:if="$addonStart" class="input-group-text">{$addonStart|noescape}</span>
+            <select class={$class} n:attr="$tagsAttributes + $customAttributes">
+                {if $native}
+                    {if $placeholder && !$multiple}
+                        <option value="">{$placeholder|noescape}</option>
+                    {/if}
+                    {foreach $options as $optionValue => $optionLabel}
+                        {var bool $selected = false}
+                        {if is_array($sessionValue)}
+                            {foreach $sessionValue as $value}
+                                {if $value == $optionValue}
+                                    {do $selected = true}
+                                {/if}
+                            {/foreach}
+                        {else}
+                            {do $selected = ($sessionValue == $optionValue)}
+                        {/if}
+                        <option n:attr="selected: $selected" value={$optionValue}>{$optionLabel|noescape}</option>
+                    {/foreach}
+                {/if}
+            </select>
+            <span n:if="$addonEnd" class="input-group-text">{$addonEnd|noescape}</span>
+        </div>
+    {else}
+        <select class="{$class}" n:attr="$tagsAttributes + $customAttributes">
+            {if $native}
+                {if $placeholder && !$multiple}
+                    <option value="">{$placeholder|noescape}</option>
+                {/if}
+                {foreach $options as $optionValue => $optionLabel}
+                    {var bool $selected = false}
+                    {if is_array($sessionValue)}
+                        {foreach $sessionValue as $value}
+                            {if $value == $optionValue}
+                                {do $selected = true}
+                            {/if}
+                        {/foreach}
+                    {else}
+                        {do $selected = ($sessionValue == $optionValue)}
+                    {/if}
+                    <option n:attr="selected: $selected" value="{$optionValue}">{$optionLabel|noescape}</option>
+                {/foreach}
+            {/if}
+        </select>
+    {/if}
+
+    {if !$native}
+        {var array $selectedItems = []}
+        {var string $variableName = $var ?? uniqid("tomselect_")}
+        {if is_array($sessionValue)}
+            {if count($sessionValue) && is_object($sessionValue[0])}
+                {do $selectedItems = array_map(function($sessionValue) { return $sessionValue->$valueProperty;}, $sessionValue)}
+            {else}
+                {do $selectedItems = $sessionValue}
+            {/if}
+        {else}
+            {if is_object($sessionValue)}
+                {do $selectedItems[] = $sessionValue->$valueProperty}
+            {else}
+                {do $selectedItems[] = $sessionValue}
+            {/if}
+        {/if}
+        <script nonce={nonce()}>
+            var {$variableName|noescape} = new TomSelect("#" + {$identifier}, {
+                placeholder: Object.assign(document.createElement("textarea"), { innerHTML: {$placeholder} }).value,
+                maxOptions: null,
+                valueField: {$valueProperty},
+                options: {$options},
+                items: {$selectedItems}, // Default selected values
+                labelField: {$labelProperty},
+                searchField: {$searchProperties},
+                sortField: {$labelProperty},
+                create: {$create},
+                render: {
+                    option: function(data, escape) {
+                        return {$renderOption|noescape};
+                    },
+                    item: function(data, escape) {
+                        return {$renderItem|noescape};
+                    },
+                    option_create: function(data, escape) {
+                        return window.app.sprintf(window.app.i18n.tomselect.create, escape(data.input));
+                    },
+                    no_results: function(data, escape) {
+                        return window.app.i18n.tomselect.no_results;
+                    }
+                }
+            });
+        </script>
+    {/if}
+{/define}
+
+{define "zf-field-select", string $label, string $name, array $options = [], array $attributes = []}
+    {var string $identifier = $attributes['id'] ?? uniqid("select-")}
+    {capture $layout}
+        {do $attributes['id'] = $identifier}
+        {include "zf-input-select", $name, $options, $attributes}
+    {/capture}
+    {do $attributes['layout'] = $layout}
+    {include "zf-field", $label, $identifier, $attributes}
+{/define}
