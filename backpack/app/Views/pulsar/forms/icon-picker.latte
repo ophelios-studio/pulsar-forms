@@ -30,24 +30,8 @@
     {var string $selectedEmoji = $sessionEmojiValue}
     {var string $selectedColor = $sessionColorValue}
 
-    {embed "zf-card"}
-        {block content}
-            <div class="zf-emoji-picker">
-                <ul>
-                    {foreach $emojis as $emoji}
-                        {if $emoji == $selectedEmoji}
-                            <li class="zf-emoji-picker-item selected" style="background-color: {$selectedColor|noescape};">{$emoji|noescape}</li>
-                        {else}
-                            <li class="zf-emoji-picker-item">{$emoji|noescape}</li>
-                        {/if}
-                    {/foreach}
-                </ul>
-            </div>
-            <input type="hidden" id="emoji-picker" name={$emojiName} value={$selectedEmoji|noescape} />
-        {/block}
-    {/embed}
-    {embed "zf-card"}
-        {block content}
+    <div class="card mb-3">
+        <div class="card-body">
             <div class="zf-color-picker">
                 <ul>
                     {foreach $colors as $color}
@@ -60,8 +44,27 @@
                 </ul>
             </div>
             <input type="hidden" id="color-picker" name={$colorName} value={$selectedColor|noescape} />
-        {/block}
-    {/embed}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="zf-emoji-picker">
+                <ul>
+                    {foreach $emojis as $emoji}
+                        {if $emoji == $selectedEmoji}
+                            <li class="zf-emoji-picker-item selected" style="background-color: {$selectedColor|noescape};">{$emoji|noescape}</li>
+                        {else}
+                            <li class="zf-emoji-picker-item">{$emoji|noescape}</li>
+                        {/if}
+                    {/foreach}
+                </ul>
+            </div>
+            <input type="hidden" id="emoji-picker" name={$emojiName} value={$selectedEmoji|noescape} />
+        </div>
+    </div>
+
+
     <script nonce={nonce()} n:syntax="off">
         window.addEventListener("load", () => {
             const colorItem = document.querySelectorAll(".zf-color-picker-item");
