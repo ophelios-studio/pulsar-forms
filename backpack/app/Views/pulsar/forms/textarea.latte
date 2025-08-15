@@ -44,6 +44,7 @@
     {var array $supportedAttributes = ['name', 'no-feedback', 'addon-start', 'addon-end', 'default', 'required', 'autocomplete', 'auto-resize']}
 
     {do $tagsAttributes['name'] = $name}
+    {do $tagsAttributes['rows'] = $rows}
     {if !$autocomplete}
         {do $tagsAttributes['autocomplete'] = "off"}
         {* Hack for Chrome browsers to understand autocomplete=off (@see https://gist.github.com/niksumeiko/360164708c3b326bd1c8?permalink_comment_id=3793032#) *}
