@@ -125,19 +125,19 @@
 {/define}
 
 {define "zf-field-email", string $label, string $name, array $attributes = []}
-    {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='bi bi-envelope-at text-primary'></i>"}
+    {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='icon bi bi-envelope-at text-primary'></i>"}
     {do $attributes['placeholder'] = $attributes['placeholder'] ?? localize("forms.placeholders.email")}
     {include "zf-field-text", $label, $name, $attributes}
 {/define}
 
 {define "zf-field-website", string $label, string $name, array $attributes = []}
-    {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='bi bi-globe-americas text-primary'></i>"}
+    {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='icon bi bi-globe-americas text-primary'></i>"}
     {do $attributes['placeholder'] = $attributes['placeholder'] ?? localize("forms.placeholders.website")}
     {include "zf-field-text", $label, $name, $attributes}
 {/define}
 
 {define "zf-field-phone", string $label, string $name, array $attributes = []}
-    {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='bi bi-telephone text-primary'></i>"}
+    {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='icon bi bi-telephone text-primary'></i>"}
     {do $attributes['placeholder'] = $attributes['placeholder'] ?? localize("forms.placeholders.phone")}
     {do $attributes['mask'] = "phone"}
     {include "zf-field-text", $label, $name, $attributes}
@@ -149,7 +149,7 @@
 {/define}
 
 {define "zf-field-money", string $label, string $name, array $attributes = []}
-    {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='bi bi-currency-dollar text-primary'></i>"}
+    {do $attributes['addon-start'] = $attributes['addon-start'] ?? "<i class='icon bi bi-currency-dollar text-primary'></i>"}
     {do $attributes['placeholder'] = $attributes['placeholder'] ?? localize("forms.placeholders.money")}
     {do $attributes['mask'] = "money"}
     {include "zf-field-text", $label, $name, $attributes}
